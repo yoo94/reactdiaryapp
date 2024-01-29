@@ -31,7 +31,8 @@
 .DiaryList {
   border: 1px solid grey;
   padding: 20px;
-  margin-top: 20px;
+  margin: auto;
+  width: 700px;
 }
 
 .DiaryList h2{
@@ -42,7 +43,7 @@
   text-align: right;
 }
 .DiaryList span{
-  display: block
+  display: block;
 }
 
 .DiaryItem {
