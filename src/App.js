@@ -1,6 +1,6 @@
 import './App.css';
-import DiaryEditor from './DiaryEditor'
-import DiaryList from './DiaryList';
+import DiaryEditor from './DiaryEditor.js'
+import DiaryList from './DiaryList.js';
 
 const dummyList = [
   {
@@ -29,7 +29,7 @@ function App() {
   return (
     <div className="App">
      <DiaryEditor/>
-     <DiaryList diaryList = {dummyList}/>
+     <DiaryList diaryItemList = {dummyList}/>
     </div>
   );
 }
