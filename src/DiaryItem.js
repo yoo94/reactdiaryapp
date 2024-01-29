@@ -1,4 +1,36 @@
-const DiaryItem = ({author,content,emotion,create_date,id,onDelete}) => {
+import { useState ,useRef} from "react"
+
+const DiaryItem = ({author,content,emotion,create_date,id,onRemove,onEdit}) => {
+  
+  const [isEdit,setisEdit] = useState(false);
+  const [updateContent,setupdateContent] = useState(content);
+  const updateContentInput = useRef();
+
+  
+  const toggleIsEdit =() => setisEdit(!isEdit);
+
+  const handleRemove = ()=>{
+    if (window.confirm(id+"번째 일기를 정말 삭제합니까?")) {
+      onRemove(id)
+    }
+  }
+
+  const handleEdit = ()=>{
+    setisEdit(false);
+    setupdateContent(content);
+  }
+  
+  const handleSaveEdit = ()=>{
+    if(updateContent.length < 5) {
+      updateContentInput.current.focus();
+      return
+    }
+    if(window.confirm(" 내용을 수정하시겠습니까?")){
+      onEdit(id,updateContent);
+      toggleIsEdit();
+    }
+    
+  }
   
   return(
     <div className="DiaryItem">
@@ -11,16 +43,27 @@ const DiaryItem = ({author,content,emotion,create_date,id,onDelete}) => {
         </span>
       </div>
       <div className="content">
-        내용 : {content}
+        {isEdit ? 
+        <textarea ref={updateContentInput} value={updateContent} onChange={(e)=>{setupdateContent(e.target.value)}}/> 
+        : 
+        <>내용 : {content}</>}
       </div>
-      <div>
-        <button onClick={()=>{
-            if (window.confirm("정말 삭제합니까?")) {
-              onDelete(id)
-            }
-          }
-        }> 삭제 </button> <button  > 수정 </button>
+      {isEdit ? 
+       <>
+       <div>
+        <button onClick={handleEdit}> 수정취소 </button>
+        <button onClick={handleSaveEdit}> 수정저장 </button>
       </div>
+       </> 
+      :
+       <>
+       <div>
+        <button onClick={handleRemove}> 삭제 </button>
+        <button onClick={toggleIsEdit}> 수정 </button>
+      </div>
+       </>
+       }
+      
     </div>
   )
 }
