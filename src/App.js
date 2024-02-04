@@ -1,10 +1,37 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef} from 'react';
 import './App.css';
 import DiaryEditor from './DiaryEditor.js'
 import DiaryList from './DiaryList.js';
 
+const reducer = (state,action) =>{
+  switch(action.type){
+    case 'INIT':{
+      return action.data;
+    }
+    case 'CREATE':{
+       const create_date = new Date().getTime();
+       const newItem ={
+        ...action.data,
+        create_date
+       }
+       return [newItem,...state]
+    }
+    case 'REMOVE':{
+      return state.filter((itm)=>{return itm.id !== action.targetId});
+    }
+    case 'EDIT':{
+      return state.map((itm)=>{
+        return itm.id === action.targetId ?  {...itm, content:action.newContent} : itm
+      })
+    }
+    default : return state;
+  }
+}
+
 const App = () => {
-  const [data,setData] = useState([]);
+  // const [data,setData] = useState([]);
+
+  const [data,dispatch] = useReducer(reducer,[])
   const dataId = useRef(0);
 
   //api 
@@ -21,7 +48,7 @@ const App = () => {
         id : dataId.current++
       }
     })
-    setData(initData)
+    dispatch({type:'INIT',data:initData},[])
   };
 
   useEffect(()=>{
@@ -31,31 +58,24 @@ const App = () => {
   const onCreate = useCallback(
     (author,content,emotion) =>{
       const create_date = new Date().getTime();
-      const newItem ={
+      dataId.current += 1;
+     dispatch({type:'CREATE',data:{
         author,
         content,
         emotion,
         create_date,
-        id: dataId.current,
-      }
-      dataId.current += 1;
-      setData((data)=>[newItem , ...data])
-    },[]
+        id: dataId.current,}
+      },[])
+    }
   )
 
   const onRemove = (targetId) => {
-    const newDiaryList = data.filter((itm)=>{
-      return itm.id !== targetId
-    })
-    setData(newDiaryList);
+    dispatch({type:'REMOVE',targetId},[])
     alert("삭제가 완료되었습니다.")
   }
+
   const onEdit = (targetId, newContent) => {
-    setData(
-      data.map((itm)=>{
-        return itm.id === targetId ?  {...itm, content:newContent} : itm
-      })
-    )
+    dispatch({type:'EDIT',targetId,newContent},[])
   }
 
   //useMemo
