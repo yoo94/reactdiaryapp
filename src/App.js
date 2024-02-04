@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useReducer, useRef} from 'react';
+import React,{ useCallback, useEffect, useMemo, useReducer, useRef} from 'react';
 import './App.css';
 import DiaryEditor from './DiaryEditor.js'
 import DiaryList from './DiaryList.js';
@@ -27,6 +27,9 @@ const reducer = (state,action) =>{
     default : return state;
   }
 }
+
+export const DiaryStateContext = React.createContext();
+export const DiaryDispatchContext = React.createContext();
 
 const App = () => {
   // const [data,setData] = useState([]);
@@ -90,15 +93,23 @@ const App = () => {
 
   const {goodCount, badCount, goodRatio} = getDiaryAnalysis;
 
+  const memoizedDispatches = useMemo(()=>{
+        return {onCreate,onEdit,onRemove};
+  },[])
+
   return (
-    <div className="App">
-     <DiaryEditor onCreate={onCreate}/>
-     <div>전체 일기 : {data.length}</div>
-     <div>좋은 일기 : {goodCount}</div>
-     <div>나쁜 일기 : {badCount}</div>
-     <div>좋은일기 비율 : {goodRatio} %</div>
-     <DiaryList onRemove= {onRemove} onEdit= {onEdit} diaryItemList = {data}/>
-    </div>
+    <DiaryStateContext.Provider value={data}>
+      <DiaryDispatchContext.Provider value={memoizedDispatches}>
+          <div className="App">
+            <DiaryEditor/>
+            <div>전체 일기 : {data.length}</div>
+            <div>좋은 일기 : {goodCount}</div>
+            <div>나쁜 일기 : {badCount}</div>
+            <div>좋은일기 비율 : {goodRatio} %</div>
+            <DiaryList/>
+          </div>
+      </DiaryDispatchContext.Provider>
+    </DiaryStateContext.Provider>
   );
 }
 
